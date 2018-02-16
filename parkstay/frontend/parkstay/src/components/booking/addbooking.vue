@@ -6,128 +6,148 @@
                     <div class="well">
                         <div class="row">
                             <div class="col-md-12">
-                                <h3 class="text-primary">{{campground.name}}</h3>
+                                <h3 class="text-primary">Book a Campsite at {{campground.name}}</h3>
                             </div>
-                            <div class="col-md-4">
-                                  <img v-if="campground.images && campground.images.length>0" :src="campground.images[0].image" width="250" class="img-thumbnail img-responsive">
-                                  <img v-else src="https://placeholdit.imgix.net/~text?txtsize=33&txt=Campground&w=250&h=250" alt="campground"  width="250" class="img-thumbnail img-responsive">
-                                  <p class="pricing" v-if="priceHistory">
-                                      <strong >${{priceHistory[0].rate.adult|formatMoney(2)}}</strong>
-                                      <br> <span class="text-muted">Per adult per night</span>
-                                  </p>
-                                  <p class="pricing" v-else>
-                                      <strong >${{0|formatMoney(2)}}</strong>
-                                       <span class="text-muted">Per adult per night</span><br>
-                                      Select campsite for pricing details
-                                  </p>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="row form-horizontal">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label class="col-md-2 control-label pull-left required"  for="Dates">Dates: </label>
-                                            <div class="col-md-4">
-                                                <div class="input-group date" id="dateArrival">
-                                                    <input type="text" class="form-control" name="arrival" placeholder="Arrival" >
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="input-group date" id="datedeparture">
-                                                    <input type="text" class="form-control" name="departure" placeholder="Departure">
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
-                                                </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <label class="control-label pull-left required" for="Dates">Dates: </label>
+                                        <div class="col-md-3">
+                                            <div class="input-group date" id="dateArrival">
+                                                <input type="text" class="form-control" name="arrival" placeholder="Arrival">
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="col-md-2 control-label pull-left required"  for="Campground">Guests: </label>
-                                            <div class="col-md-8">
-                                                  <div class="dropdown guests">
-                                                      <input type="text" class="form-control dropdown-toggle" name="guests" placeholder="Guests" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" v-model="guestsText">
-                                                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                                          <li v-for="guest in guestsPicker">
-                                                              <div class="row">
-                                                                  <div class="col-sm-8">
+                                        <div class="col-md-3">
+                                            <div class="input-group date" id="datedeparture">
+                                                <input type="text" class="form-control" name="departure" placeholder="Departure">
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="control-label pull-left required"  for="Campground">Guests: </label>
+                                                <div class="col-md-8">
+                                                    <div class="dropdown guests">
+                                                        <input type="text" class="form-control dropdown-toggle" name="guests" placeholder="Guests" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" v-model="guestsText">
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                            <li v-for="guest in guestsPicker">
+                                                                <div class="row">
+                                                                     <div class="col-sm-4">
                                                                       <span class="item">
                                                                           {{guest.amount}} {{guest.name}} <span style="color:#888;font-weight:300;font-size:12px;">{{guest.description}}</span>
                                                                       </span>
                                                                       <br/><a href="#" class="text-info" v-show="guest.helpText">{{guest.helpText}}</a>
-                                                                  </div>
+                                                                     </div>
                                                                   <div class="pull-right">
                                                                       <div class="btn-group btn-group-sm">
                                                                         <button type="button" class="btn btn-guest" @click.prevent.stop="addGuestCount(guest)"><span class="glyphicon glyphicon-plus"></span></button>
                                                                         <button type="button" class="btn btn-guest" @click.prevent.stop="removeGuestCount(guest)"><span class="glyphicon glyphicon-minus"></span></button>
                                                                       </div>
                                                                   </div>
-                                                              </div>
-                                                          </li>
-                                                      </ul>
-                                                  </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="well">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <h3 class="text-primary">Campsite Booking</h3>
-                                <p>
-                                    Click <a target="_blank" :href="campground.campground_map">here</a> to open the map of the campground to help you select the preferred campsite
-                                </p>
-                                <ul class="nav nav-tabs">
-                                    <li :class="{active:campground.site_type == 0}" v-show="campground.site_type == 0" ><a data-toggle="tab" href="#campsite-booking" @click.prevent="booking_type=booking_types.CAMPSITE">Campsite</a></li>
-                                    <li :class="{active:(campground.site_type == 1) || (campground.site_type == 2)}" v-show="campground.site_type == 1" ><a data-toggle="tab" href="#campsite-class-booking" @click.prevent="booking_type=booking_types.CLASS">Campsite Type </a></li>
-                                </ul>
-                                <div class="tab-content">
-                                    <div id="campsite-booking" class="tab-pane fade in active" v-if="campground.site_type == 0">
-                                        <div class="row">
-                                            <div v-show="campsites.length < 1" class="col-lg-12 text-center">
-                                                <h2>No Campsites Available For The Provided Dates</h2>
-                                            </div>
-                                          <div v-show="campsites.length > 0" class="col-md-6">
-                                              <div class="form-group">
-                                                <label for="Campsite" class="required">Campsite</label>
-                                                <select class="form-control" name="campsite" v-model="selected_campsite">
-                                                    <option value=""></option>
-                                                    <option v-for="campsite in campsites" :value="campsite.id">{{campsite.name}} - {{campsite.type}}</option>
-                                                </select>
-                                              </div>
-                                          </div>
-                                        </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="campsite-booking" v-if="campground.site_type == 0">
+                                <div class="row">
+                                    <div v-show="campsites.length < 1" class="col-lg-12 text-center">
+                                        <h2>No Campsites Available For The Provided Dates</h2>
                                     </div>
-                                    <div id="campsite-class-booking" class="tab-pane fade in active" v-if="(campground.site_type == 1) || (campground.site_type == 2)">
-                                        <div class="row">
-                                            <div v-show="campsite_classes.length < 1" class="col-lg-12 text-center">
-                                                <h2>No Campsites Available For The Provided Dates</h2>
-                                            </div>
-                                          <div v-for="(c,i) in campsite_classes" class="col-lg-3 col-md-4 col-sm-6">
-                                              <div class="radio">
-                                              <label>
-                                                <input type="radio" name="campsite-type" :value="i" v-model="selected_campsite_class">
-                                                {{c.name}}
-                                              </label>
-                                          </div>
-                                        </div>
+                                    <div v-show="campsites.length > 0" class="col-md-12">
+                                        <div class="row"><div class="column table-scroll">
+                                        <table class="hover" name="campsite" v-model="selected_campsite">
+                                            <thead>
+                                                <tr>
+                                                    <th class="site">Campsite&nbsp;<a class="float-right" target="_blank" :href="map" v-if="map">View Map</a></th>
+                                                    <th class="book">Book</th>
+                                                    <th class="numBook">Number of booked site</th>
+                                                    <th class="date">{{ date }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody><template v-for="campsite in campsites">
+                                                   <tr>
+                                                     <td class="site"> {{campsite.name}} - {{campsite.type}}</td>
+                                                     <td class="book">
+                                                        <template>
+                                                            <button class="button"><small>Book now</small></button>
+                                                            <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
+                                                        </template>
+                                                     </td>
+                                                     <td class="numBook">
+                                                        <input type="text" class="input" value="1">
+                                                     </td>
+                                                     <td class="price"> {{ booking.campsite.price }} </td>      
+                                                    </tr>
+                                                    </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    </div>
                                     </div>
                                 </div>
-
+                            </div>
+                            <div class="col-lg-12">   
+                                <div id="campsite-class-booking" v-if="(campground.site_type == 1) || (campground.site_type == 2)">
+                                    <div class="row">
+                                        <div v-show="campsite_classes.length < 1" class="col-lg-12 text-center">
+                                            <h2>No Campsites Available For The Provided Dates</h2>
+                                        </div>
+                                            <div v-show="campsite_classes.length > 1" class="col-md-12">
+                                                <div class="row">
+                                                   <div class="column table-scroll"> 
+                                               <table class="hover" name="campsite-type" v-model="selected_campsite_class">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="site">Campsite</th>
+                                                            <th class="book">Book</th>
+                                                            <th class="numBook">Number of booked site</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody><template v-for="(c,i) in campsite_classes">
+                                                        <tr>
+                                                            <td class="site"> {{c.name}} <span v-if="c.class"> - {{ classes[c.class] }}</span><span v-if="c.warning" class="siteWarning"> - {{ c.warning }}</span></td>
+                                                            <td class="book">
+                                                                <template>
+                                                                    <button class="button"><small>Book now</small><br/>{{ c.campsites.length }} available </button>
+                                                                    <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
+                                                                </template>
+                                                            </td>
+                                                            <td class="numBook">
+                                                                <input type="text" v-bind:value="number" class="form-control">
+                                                            </td>      
+                                                        </tr>
+                                                        <template ><tr class="breakdown">
+                                                            <td class="site"></td>
+                                                            <td></td>
+                                                        </tr></template>
+                                                    </template></tbody>
+                                                </table>
+                                            </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                              
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>       
             <div class="row">
                 <div class="col-lg-12">
                     <div class="well">
@@ -185,7 +205,7 @@
                                       </div>
                                   </div>
                                 </div>
-                                <div class="row">
+                            <div class="row">
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="Phone" class="required">Phone <span class="text-muted">(mobile prefered)</span></label>
@@ -247,7 +267,6 @@
                                         <input type="checkbox" class="form-control" required="required" v-model="v.entry_fee" @change="updatePrices()">
                                       </div>
                                   </div>
-
                                 </div>
                                 <p><b>NOTE:</b> A vehicle entry fee is not required for the holder of a valid Park Pass.</p>
                             </div>
@@ -255,7 +274,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+        <div class="row">
                 <div class="col-lg-12">
                     <div class="well">
                         <div class="row">
@@ -270,12 +289,33 @@
                           </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                  <div class="checkbox">
+                                    <label for="Overide price"><input type="checkbox" />Overide price changed</label>
+                                  </div>
+                                <div class="input-group">
+                                  <span class="input-group-addon">AUD <i class="fa fa-usd"></i></span>
+                                  <input type="text" class="form-control" :placeholder="0|formatMoney(2)" :value="booking.price|formatMoney(2)" readonly="true">
+                                </div>
+                              </div>
+                          </div>
+                          <div class="col-md-6">
                                 <p class="text-muted">
-                                    Payments will be recorded against the booking once the booking is completed and the payment is received.
+                                    Payments will need to be recorded against the booking once the booking is completed and the payment is received.
                                 </p>
-                            </div>
-                            <div class="col-md-6">
+                           </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="Reason">Reason</label>
+                                  <input type="text" class="form-control">
+                              </div>
+                          </div>
+                        </div>
+                        <div class="row">                          
+                            <div class="col-md-12">
                               <button type="button" class="btn btn-primary btn-lg pull-right" @click="bookNow()"> Book</button>
                             </div>
                         </div>
@@ -507,6 +547,9 @@ export default {
                 vm.fetchCampsiteClasses();
             }
         },
+        getDateString: function (date, offset) {
+            return moment(date).add(offset, 'days').format('ddd MMM D');
+        },
         validateRego:function (e) {
             formValidate.isNotEmpty(e.target);
         },
@@ -548,7 +591,6 @@ export default {
             vm.$http.get(api_endpoints.countries).then((response)=>{
                 vm.countries = response.body;
                 vm.loading.splice('fetching countries',1);
-
             },(response)=>{
                 console.log(response);
                 vm.loading.splice('fetching countries',1);
@@ -617,7 +659,6 @@ export default {
                 console.log(error);
                 vm.loading.splice('fetching stay history',1);
             });
-
         },
         fetchPark:function () {
             let vm =this;
@@ -677,7 +718,6 @@ export default {
             }, (error) => {
                 console.log(error);
             });
-
         },
         addGuestCount:function (guest) {
             let vm =this;
@@ -696,7 +736,6 @@ export default {
                     vm.booking.guests.infant = guest.amount;
                     break;
                 default:
-
             }
             vm.generateGuestCountText();
         },
@@ -717,7 +756,6 @@ export default {
                     vm.booking.guests.infant = guest.amount;
                     break;
                 default:
-
             }
             vm.generateGuestCountText();
         },
@@ -735,19 +773,15 @@ export default {
             vm.booking.price = 0;
             if (vm.park.entry_fee_required){
                 vm.fetchParkPrices(function(){
-
                     $.each(vm.priceHistory,function (i,price) {
                         for (var guest in vm.booking.guests) {
                             if (vm.booking.guests.hasOwnProperty(guest)) {
                                 vm.booking.price += vm.booking.guests[guest] * price.rate[guest];
                             }
                         }
-
                     });
-
                     vm.updateParkEntryPrices()
                     vm.booking.price = vm.booking.price + vm.booking.entryFees.entry_fee;
-
                 });
             } else {
                 $.each(vm.priceHistory,function (i,price) {
@@ -756,7 +790,6 @@ export default {
                             vm.booking.price += vm.booking.guests[guest] * price.rate[guest];
                         }
                     }
-
                 });
             }
         },
@@ -818,7 +851,6 @@ export default {
                 vm.parkPrices.concession = "0.00";
                 calcprices();
             }
-
         },
         autofillUser:function (event) {
             let vm =this;
@@ -868,7 +900,6 @@ export default {
                             vm.booking.entryFees.entry_fee +=  parseInt(vm.parkPrices.concession);
                             vm.booking.entryFees.concession++;
                             break;
-
                     }
                 });
                 var booking = {
@@ -914,7 +945,6 @@ export default {
                     vm.loading.splice('processing booking',1);
                 });
             }
-
         },
         finishBooking:function () {
             let vm =this;
@@ -959,13 +989,10 @@ export default {
                 showErrors: function(errorMap, errorList) {
                     $.each(this.validElements(), function(index, element) {
                         var $element = $(element);
-
                         $element.attr("data-original-title", "").parents('.form-group').removeClass('has-error');
                     });
-
                     // destroy tooltips on valid elements
                     $("." + this.settings.validClass).tooltip("destroy");
-
                     // add or update tooltips
                     for (var i = 0; i < errorList.length; i++) {
                         var error = errorList[i];
@@ -980,7 +1007,6 @@ export default {
             });
         },
         addVehicleCount:function (park_entry) {
-
             let vm = this;
             var count = vm.booking.parkEntry.vehicles
             if( park_entry.amount < 10 && count < 10){
@@ -991,7 +1017,6 @@ export default {
             vm.booking.price = vm.booking.price - vm.booking.entryFees.entry_fee;
             vm.updateParkEntryPrices();
             vm.booking.price = vm.booking.price + vm.booking.entryFees.entry_fee;
-
         },
         removeVehicleCount:function (park_entry) {
             let vm = this;
@@ -1011,9 +1036,7 @@ export default {
                     if (found) {
                         break;
                     }
-
                 }
-
             }
             vm.booking.price = vm.booking.price - vm.booking.entryFees.entry_fee;
             vm.updateParkEntryPrices();
@@ -1029,7 +1052,6 @@ export default {
         vm.generateGuestCountText();
     }
 }
-
 </script>
 
 <style lang="css">
@@ -1080,5 +1102,9 @@ export default {
     }
     .nav-tabs{
         margin-top: 15px;
+    }
+    .siteWarning {
+        font-weight: bold;
+        font-style: italic;
     }
 </style>
