@@ -520,6 +520,11 @@ def price_or_lineitems(request,booking,campsite_list,lines=True,old_booking=None
         return invoice_lines
     else:
         return total_price
+    # Create line items for Discount
+    if lines:
+        total_price = booking.override_price - booking.cost_total 
+        reason = booking.override_price_reason
+        invoice_lines.append({'ledger_description':'{}'.format(reason), "Total": total_price, "oracle_code":booking.campground.oracle_code})
 
 def check_date_diff(old_booking,new_booking):
     if old_booking.arrival == new_booking.arrival and old_booking.departure == new_booking.departure:
@@ -791,7 +796,6 @@ def checkout(request, booking, lines, invoice_text=None, vouchers=[], internal=F
         if internal or request.user.is_anonymous():
             parameters['basket_owner'] = booking.customer.id
 
-
         url = request.build_absolute_uri(
             reverse('payments:ledger-initial-checkout')
         )
@@ -835,6 +839,7 @@ def internal_booking(request,booking_details,internal=True,updating=False):
     try:
         booking = create_or_update_booking(request,booking_details,updating)
         with transaction.atomic():
+            #import pdb; pdb.set_trace()
             set_session_booking(request.session,booking)
             # Get line items
             booking_arrival = booking.arrival.strftime('%d-%m-%Y')

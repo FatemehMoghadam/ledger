@@ -1652,6 +1652,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             end_date = datetime.strptime(request.data['departure'],'%Y/%m/%d').date()
             guests = request.data['guests']
             costs = request.data['costs']
+            override_price = request.data.get('override_price', None)
             try:
                 emailUser = request.data['customer']
                 customer = EmailUser.objects.get(email = emailUser['email'])
@@ -1680,6 +1681,7 @@ class BookingViewSet(viewsets.ModelViewSet):
                 'num_child' : guests['child'],
                 'num_infant' : guests['infant'],
                 'cost_total' : costs['total'],
+                'override_price' : override_price,
                 'customer' : customer,
                 'first_name': emailUser['first_name'],
                 'last_name': emailUser['last_name'],

@@ -885,6 +885,8 @@ class Booking(models.Model):
     booking_type = models.SmallIntegerField(choices=BOOKING_TYPE_CHOICES, default=0)
     expiry_time = models.DateTimeField(blank=True, null=True)
     cost_total = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
+    override_price_reason = models.TextField(null=True,blank=True)
+    override_price = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
     campground = models.ForeignKey('Campground', null=True)
     is_canceled = models.BooleanField(default=False)
     cancellation_reason = models.TextField(null=True,blank=True)

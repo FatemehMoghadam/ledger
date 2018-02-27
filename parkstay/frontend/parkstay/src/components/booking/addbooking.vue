@@ -8,11 +8,12 @@
                             <div class="col-md-12">
                                 <h3 class="text-primary">Book a Campsite at {{campground.name}}</h3>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <div class="col-md-12">
-                                            <label class="control-label pull-left required" for="Dates">Dates: </label>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label pull-left required" for="Dates">Dates: </label>
                                         <div class="col-md-3">
                                             <div class="input-group date" id="dateArrival">
                                                 <input type="text" class="form-control" name="arrival" placeholder="Arrival">
@@ -55,99 +56,100 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>                                        
                                     </div>
                                 </div>
+                            </div>
+                        </div>                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="campsite-booking" v-if="campground.site_type == 0">
+                                <div v-show="campsites.length < 1" class="col-lg-12 text-center">
+                                    <h2>No Campsites Available For The Provided Dates</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row"> 
+                        <div class="col-sm-12">
+                            <div v-show="campsites.length > 0" >
+                                <div class="column table-scroll">
+                                    <table class="hover table table-striped table-bordered dt-responsive nowrap"  cellspacing="0" width="100%"  name="campsite" v-model="selected_campsite">
+                                        <thead>
+                                            <tr>
+                                                <th class="site">Campsite&nbsp;<a class="float-right" target="_blank" :href="map" v-if="map">View Map</a></th>
+                                                <th class="book">Book</th>
+                                                <th class="numBook">Number of booked site</th>
+                                                <th class="date"> {{booking.departure}} </th>
+                                            </tr>
+                                        </thead>
+                                            <tbody><template v-for="campsite in campsites">
+                                                <tr>
+                                                    <td class="site"> {{campsite.name}} - {{campsite.type}}</td>
+                                                    <td class="book">
+                                                        <template>
+                                                            <button class="button"><small>Book now</small></button>
+                                                            <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
+                                                        </template>
+                                                    </td>
+                                                    <td class="numBook">
+                                                        <input type="text" class="input" value="1">
+                                                    </td>
+                                                    <td class="price"><i class="fa fa-usd"></i> {{ booking.price }} </td>                                               
+                                                </tr></template>
+                                            </tbody>
+                                    </table>
+                                </div>                                        
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <div id="campsite-booking" v-if="campground.site_type == 0">
+                            <div id="campsite-class-booking" v-if="(campground.site_type == 1) || (campground.site_type == 2)">
                                 <div class="row">
-                                    <div v-show="campsites.length < 1" class="col-lg-12 text-center">
+                                    <div v-show="campsite_classes.length < 1" class="col-lg-12 text-center">
                                         <h2>No Campsites Available For The Provided Dates</h2>
-                                    </div>
-                                    <div v-show="campsites.length > 0" class="col-md-12">
-                                        <div class="row"><div class="column table-scroll">
-                                        <table class="hover" name="campsite" v-model="selected_campsite">
-                                            <thead>
-                                                <tr>
-                                                    <th class="site">Campsite&nbsp;<a class="float-right" target="_blank" :href="map" v-if="map">View Map</a></th>
-                                                    <th class="book">Book</th>
-                                                    <th class="numBook">Number of booked site</th>
-                                                    <th class="date">{{ date }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody><template v-for="campsite in campsites">
-                                                   <tr>
-                                                     <td class="site"> {{campsite.name}} - {{campsite.type}}</td>
-                                                     <td class="book">
-                                                        <template>
-                                                            <button class="button"><small>Book now</small></button>
-                                                            <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
-                                                        </template>
-                                                     </td>
-                                                     <td class="numBook">
-                                                        <input type="text" class="input" value="1">
-                                                     </td>
-                                                     <td class="price"> {{ booking.campsite.price }} </td>      
-                                                    </tr>
-                                                    </template>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-12">   
-                                <div id="campsite-class-booking" v-if="(campground.site_type == 1) || (campground.site_type == 2)">
-                                    <div class="row">
-                                        <div v-show="campsite_classes.length < 1" class="col-lg-12 text-center">
-                                            <h2>No Campsites Available For The Provided Dates</h2>
-                                        </div>
-                                            <div v-show="campsite_classes.length > 1" class="col-md-12">
-                                                <div class="row">
-                                                   <div class="column table-scroll"> 
-                                               <table class="hover" name="campsite-type" v-model="selected_campsite_class">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="site">Campsite</th>
-                                                            <th class="book">Book</th>
-                                                            <th class="numBook">Number of booked site</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody><template v-for="(c,i) in campsite_classes">
-                                                        <tr>
-                                                            <td class="site"> {{c.name}} <span v-if="c.class"> - {{ classes[c.class] }}</span><span v-if="c.warning" class="siteWarning"> - {{ c.warning }}</span></td>
-                                                            <td class="book">
-                                                                <template>
-                                                                    <button class="button"><small>Book now</small><br/>{{ c.campsites.length }} available </button>
-                                                                    <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
-                                                                </template>
-                                                            </td>
-                                                            <td class="numBook">
-                                                                <input type="text" v-bind:value="number" class="form-control">
-                                                            </td>      
-                                                        </tr>
-                                                        <template ><tr class="breakdown">
-                                                            <td class="site"></td>
-                                                            <td></td>
-                                                        </tr></template>
-                                                    </template></tbody>
-                                                </table>
-                                            </div>
-                                            </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>                              
+                        </div>
+                    </div>  
+                    <div class="row"> 
+                        <div class="col-sm-12">
+                            <div v-show="campsite_classes.length > 1">
+                                <div class="column table-scroll">
+                                    <table class="hover table table-striped table-bordered dt-responsive nowrap"  cellspacing="0" width="100%" name="campsite-type" v-model="selected_campsite_class">
+                                        <thead>
+                                            <tr>
+                                                 <th class="site">Campsite</th>
+                                                 <th class="book">Book</th>
+                                                 <th class="numBook">Number of booked site</th>
+                                                 <th class="date"> {{booking.departure}} </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody><template v-for="(c,i) in campsite_classes">
+                                            <tr>
+                                                <td class="site"> {{c.name}} <span v-if="c.class"> - {{ classes[c.class] }}</span><span v-if="c.warning" class="siteWarning"> - {{ c.warning }}</span></td>
+                                                <td class="book">
+                                                    <template>
+                                                        <button class="button"><small>Book now</small><br/>{{ c.campsites.length }} available </button>
+                                                        <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
+                                                    </template>
+                                                </td>
+                                                <td class="numBook">
+                                                    <input type="text" name="booked_site" class="form-control" v-model="c.booked_site">
+                                                </td> 
+                                                <td class="price"><i class="fa fa-usd"></i> {{ booking.price }} </td>     
+                                            </tr></template>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                 </div>
-            </div>       
+            </div>
+        </div>      
             <div class="row">
                 <div class="col-lg-12">
                     <div class="well">
@@ -275,54 +277,63 @@
                 </div>
             </div>
         <div class="row">
-                <div class="col-lg-12">
-                    <div class="well">
-                        <div class="row">
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                <label for="Total Price">Total Price <span class="text-muted">(GST inclusive.)</span></label>
-                                <div class="input-group">
-                                  <span class="input-group-addon">AUD <i class="fa fa-usd"></i></span>
-                                  <input type="text" class="form-control" :placeholder="0|formatMoney(2)" :value="booking.price|formatMoney(2)" readonly="true">
+            <div class="col-lg-12">
+                <div class="well">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="Total Price">Total Price <span class="text-muted">(GST inclusive.)</span></label>
+                                        <div class="input-group">
+                                        <span class="input-group-addon">AUD <i class="fa fa-usd"></i></span>
+                                        <input type="text" class="form-control" :placeholder="0|formatMoney(2)" :value="booking.price|formatMoney(2)" readonly="true">
+                                        </div>
+                                    </div>
                                 </div>
-                              </div>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <div class="checkbox">
-                                    <label for="Overide price"><input type="checkbox" />Overide price changed</label>
-                                  </div>
-                                <div class="input-group">
-                                  <span class="input-group-addon">AUD <i class="fa fa-usd"></i></span>
-                                  <input type="text" class="form-control" :placeholder="0|formatMoney(2)" :value="booking.price|formatMoney(2)" readonly="true">
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <label for="Override price"><input type="checkbox" v-model="checked"/>Override price charged</label>
+                                        </div>
+                                        <div class="input-group" v-if="checked">
+                                        <span class="input-group-addon">AUD <i class="fa fa-usd"></i></span>
+                                        <input type="text" class="form-control" :placeholder="0|formatMoney(2)" v-model="booking.override_price">
+                                        </div>
+                                    </div>
                                 </div>
-                              </div>
-                          </div>
-                          <div class="col-md-6">
-                                <p class="text-muted">
-                                    Payments will need to be recorded against the booking once the booking is completed and the payment is received.
-                                </p>
-                           </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group" v-if="checked">
+                                        <label for="Reason">Reason</label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="row">
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                <label for="Reason">Reason</label>
-                                  <input type="text" class="form-control">
-                              </div>
-                          </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <p class="text-muted">
+                                        Payments will need to be recorded against the booking once the booking is completed and the payment is received.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="row">                          
-                            <div class="col-md-12">
-                              <button type="button" class="btn btn-primary btn-lg pull-right" @click="bookNow()"> Book</button>
+                        <div class="col-lg-6">
+                            <div class="row">                          
+                                <div class="col-lg-12">
+                                    <button type="button" class="btn btn-primary btn-lg pull-right" @click="bookNow()"> Book</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
         </form>
         <loader :isLoading="isLoading" >{{loading.join(' , ')}}...</loader>
         <modal :large="true" @cancel="finishBooking()" :force="true">
@@ -349,6 +360,7 @@ export default {
     data:function () {
         let vm =this;
         return{
+            checked: false,
             isModalOpen:false,
             bookingForm:null,
             countries:[],
@@ -375,6 +387,8 @@ export default {
                 phone:"",
                 vehicle:"",
                 price:"0",
+                override_price:"0",
+                override_price_reason:"",
                 parkEntry:{
                     vehicles:0,
                 },
@@ -386,7 +400,7 @@ export default {
                     regos:[]
                 }
             },
-            campsites:[],
+            campsites:[],     
             loading:[],
             campground:{},
             guestsText:"",
@@ -913,6 +927,8 @@ export default {
                         parkEntry:vm.parkPrices,
                         total:vm.booking.price
                     },
+                    override_price:vm.booking.override_price,
+                    override_price_reason:vm.booking.override_price_reason,
                     customer:{
                         email:vm.booking.email,
                         first_name:vm.booking.firstname,
