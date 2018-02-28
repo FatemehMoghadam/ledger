@@ -520,6 +520,11 @@ def price_or_lineitems(request,booking,campsite_list,lines=True,old_booking=None
         return invoice_lines
     else:
         return total_price
+    # Create line items for Discount
+    if lines:
+        total_price = booking.override_price - booking.cost_total 
+        reason = booking.override_price_reason
+        invoice_lines.append({'ledger_description':'{}'.format(reason), "Total": total_price, "oracle_code":booking.campground.oracle_code})
 
 def check_date_diff(old_booking,new_booking):
     if old_booking.arrival == new_booking.arrival and old_booking.departure == new_booking.departure:
