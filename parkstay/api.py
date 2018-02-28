@@ -597,7 +597,7 @@ class CampgroundViewSet(viewsets.ModelViewSet):
         with transaction.atomic():
             try:
                 http_status = status.HTTP_200_OK
-                closure_data = request.data.copy();
+                closure_data = request.data.copy()
                 campgrounds = closure_data.pop('campgrounds[]')
                 '''Thread for performance / no error messages though'''
                 #import thread
@@ -2252,7 +2252,7 @@ class UpdateProfileContact(views.APIView):
             serializer.is_valid(raise_exception=True)
             instance = serializer.save()
             serializer = UserSerializer(instance)
-            return Response(serializer.data);
+            return Response(serializer.data)
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise

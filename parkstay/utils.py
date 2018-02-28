@@ -796,7 +796,6 @@ def checkout(request, booking, lines, invoice_text=None, vouchers=[], internal=F
         if internal or request.user.is_anonymous():
             parameters['basket_owner'] = booking.customer.id
 
-
         url = request.build_absolute_uri(
             reverse('payments:ledger-initial-checkout')
         )
@@ -840,6 +839,7 @@ def internal_booking(request,booking_details,internal=True,updating=False):
     try:
         booking = create_or_update_booking(request,booking_details,updating)
         with transaction.atomic():
+            #import pdb; pdb.set_trace()
             set_session_booking(request.session,booking)
             # Get line items
             booking_arrival = booking.arrival.strftime('%d-%m-%Y')

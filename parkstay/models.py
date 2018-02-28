@@ -881,7 +881,11 @@ class Booking(models.Model):
     expiry_time = models.DateTimeField(blank=True, null=True)
     cost_total = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
     override_price_reason = models.TextField(null=True,blank=True)
+<<<<<<< HEAD
     override_price = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')  
+=======
+    override_price = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
+>>>>>>> 4af04810206ab74e9d62cd7c58bf4ea200edfae0
     campground = models.ForeignKey('Campground', null=True)
     is_canceled = models.BooleanField(default=False)
     cancellation_reason = models.TextField(null=True,blank=True)

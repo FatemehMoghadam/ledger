@@ -8,11 +8,20 @@
                             <div class="col-md-12">
                                 <h3 class="text-primary">Book a Campsite at {{campground.name}}</h3>
                             </div>
+<<<<<<< HEAD
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <div class="col-md-12">
                                             <label class="control-label pull-left required" for="Dates">Dates: </label>
+=======
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label pull-left required" for="Dates">Dates: </label>
+>>>>>>> 4af04810206ab74e9d62cd7c58bf4ea200edfae0
                                         <div class="col-md-3">
                                             <div class="input-group date" id="dateArrival">
                                                 <input type="text" class="form-control" name="arrival" placeholder="Arrival">
@@ -148,8 +157,12 @@
                     </div> 
                 </div>
             </div>
+<<<<<<< HEAD
         </div>
     </div>      
+=======
+        </div>      
+>>>>>>> 4af04810206ab74e9d62cd7c58bf4ea200edfae0
             <div class="row">
                 <div class="col-lg-12">
                     <div class="well">
