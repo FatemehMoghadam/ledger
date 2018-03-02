@@ -8,20 +8,11 @@
                             <div class="col-md-12">
                                 <h3 class="text-primary">Book a Campsite at {{campground.name}}</h3>
                             </div>
-<<<<<<< HEAD
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <div class="col-md-12">
                                             <label class="control-label pull-left required" for="Dates">Dates: </label>
-=======
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <label class="control-label pull-left required" for="Dates">Dates: </label>
->>>>>>> 4af04810206ab74e9d62cd7c58bf4ea200edfae0
                                         <div class="col-md-3">
                                             <div class="input-group date" id="dateArrival">
                                                 <input type="text" class="form-control" name="arrival" placeholder="Arrival">
@@ -86,22 +77,15 @@
                                         <thead>
                                             <tr>
                                                 <th class="site">Campsite&nbsp;<a class="float-right" target="_blank" :href="map" v-if="map">View Map</a></th>
-                                                <th class="book">Book</th>
-                                                <th class="numBook">Number of booked site</th>
+                                                <th class="numBook">Number of sites to book</th>
                                                 <th class="date"> {{booking.departure}} </th>
                                             </tr>
                                         </thead>
                                             <tbody><template v-for="campsite in campsites">
                                                 <tr>
                                                     <td class="site"> {{campsite.name}} - {{campsite.type}}</td>
-                                                    <td class="book">
-                                                        <template>
-                                                            <button class="button"><small>Book now</small></button>
-                                                            <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
-                                                        </template>
-                                                    </td>
                                                     <td class="numBook">
-                                                        <input type="text" class="input" value="1">
+                                                        <input type="checkbox" v-model="selected_campsite.campsites">
                                                     </td>
                                                     <td class="price"><i class="fa fa-usd"></i> {{ booking.price }} </td>                                               
                                                 </tr></template>
@@ -130,22 +114,17 @@
                                         <thead>
                                             <tr>
                                                  <th class="site">Campsite</th>
-                                                 <th class="book">Book</th>
-                                                 <th class="numBook">Number of booked site</th>
+                                                 <th class="book">Availability</th>
+                                                 <th class="numBook">Number of sites to book</th>
                                                  <th class="date"> {{booking.departure}} </th>
                                             </tr>
                                         </thead>
                                         <tbody><template v-for="(c,i) in campsite_classes">
                                             <tr>
                                                 <td class="site"> {{c.name}} <span v-if="c.class"> - {{ classes[c.class] }}</span><span v-if="c.warning" class="siteWarning"> - {{ c.warning }}</span></td>
-                                                <td class="book">
-                                                    <template>
-                                                        <button class="button"><small>Book now</small><br/>{{ c.campsites.length }} available </button>
-                                                        <button v-else disabled class="button has-tip" title="Please complete your current ongoing booking using the button at the top of the page."><small>Book now</small><br/></button>
-                                                    </template>
-                                                </td>
+                                                <td class="book"> {{ c.campsites.length }} available </td>
                                                 <td class="numBook">
-                                                    <input type="text" name="booked_site" class="form-control" v-model="c.booked_site">
+                                                    <input type="text" name="campsite-type" class="form-control" v-model="c.selected_campsite_class">
                                                 </td> 
                                                 <td class="price"><i class="fa fa-usd"></i> {{ booking.price }} </td>     
                                             </tr></template>
@@ -157,12 +136,8 @@
                     </div> 
                 </div>
             </div>
-<<<<<<< HEAD
         </div>
     </div>      
-=======
-        </div>      
->>>>>>> 4af04810206ab74e9d62cd7c58bf4ea200edfae0
             <div class="row">
                 <div class="col-lg-12">
                     <div class="well">
@@ -322,7 +297,7 @@
                                 <div class="col-lg-12">
                                     <div class="form-group" v-if="checked">
                                         <label for="Reason">Reason</label>
-                                        <input type="text" class="form-control">
+                                        <input type="text" class="form-control" v-model="booking.override_price_reason">
                                     </div>
                                 </div>
                             </div>
@@ -942,6 +917,7 @@ export default {
                     },
                     override_price:vm.booking.override_price,
                     override_price_reason:vm.booking.override_price_reason,
+                    booked_site:vm.booking.booked_site,
                     customer:{
                         email:vm.booking.email,
                         first_name:vm.booking.firstname,
