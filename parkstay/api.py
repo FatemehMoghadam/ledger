@@ -52,6 +52,7 @@ from parkstay.models import (Campground,
                                 ClosureReason,
                                 PriceReason,
                                 MaximumStayReason,
+                                DiscountReason,
                                 ParkEntryRate,
                                 BookingVehicleRego
                                 )
@@ -87,6 +88,7 @@ from parkstay.serialisers import (  CampsiteBookingSerialiser,
                                     ClosureReasonSerializer,
                                     PriceReasonSerializer,
                                     MaximumStayReasonSerializer,
+                                    DiscountReasonSerializer,
                                     BulkPricingSerializer,
                                     UsersSerializer,
                                     AccountsAddressSerializer,
@@ -297,6 +299,25 @@ class CampsiteViewSet(viewsets.ModelViewSet):
         except Exception as e:
             raise serializers.ValidationError(str(e))
 
+    @csrf_exempt
+    @list_route(methods=['post'])
+    def current_price_list(self, request, format='json', pk=None):
+        with transaction.atomic():
+            try:
+                http_status = status.HTTP_200_OK
+                rate_data = request.data.copy()
+                campsites = rate_data.pop('campsites')
+                start_date = rate_data.pop('arrival')
+                end_date = rate_data.pop('departure')
+                res = utils.get_campsites_current_rate(self.request, campsites, start_date, end_date)
+
+                return Response(res,status=http_status )
+            except serializers.ValidationError:
+                print(traceback.print_exc())
+                raise serializers.ValidationError(str(e[0]))
+            except Exception as e:
+                print(traceback.print_exc())
+                raise serializers.ValidationError(str(e[0]))
 
 
 class CampsiteStayHistoryViewSet(viewsets.ModelViewSet):
@@ -1671,7 +1692,7 @@ class BookingViewSet(viewsets.ModelViewSet):
                     raise serializers.ValidationError("Country you have entered does not exist")
 
             booking_details = {
-                'campsite_id':request.data['campsite'],
+                'campsite_id': request.data['campsite'],
                 'start_date' : start_date,
                 'end_date' : end_date,
                 'num_adult' : guests['adult'],
@@ -1698,7 +1719,10 @@ class BookingViewSet(viewsets.ModelViewSet):
             print(traceback.print_exc())
             raise
         except ValidationError as e:
-            raise serializers.ValidationError(repr(e.error_dict))
+            if hasattr(e,'error_dict'):
+                raise serializers.ValidationError(repr(e.error_dict))
+            else:
+                raise serializers.ValidationError(repr(e[0].encode('utf-8')))
         except Exception as e:
             utils.delete_session_booking(request.session)
             if userCreated:
@@ -1990,6 +2014,10 @@ class PriceReasonViewSet(viewsets.ReadOnlyModelViewSet):
 class MaximumStayReasonViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MaximumStayReason.objects.all()
     serializer_class = MaximumStayReasonSerializer
+
+class DiscountReasonViewset(viewsets.ReadOnlyModelViewSet):
+    queryset = DiscountReason.objects.all()
+    serializer_class = DiscountReasonSerializer
 
 class CountryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Country.objects.order_by('-display_order', 'printable_name')

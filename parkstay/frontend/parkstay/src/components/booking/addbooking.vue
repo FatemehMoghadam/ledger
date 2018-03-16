@@ -8,6 +8,9 @@
                             <div class="col-md-12">
                                 <h3 class="text-primary">Book a Campsite at {{campground.name}}</h3>
                             </div>
+                            <div class="col-md-12">
+                                <p>Please visit the <a target='_blank' v-bind:href="'/availability_admin/?site_id=' + campground.id "> Campsite Availability checker</a> for expected availability.</p>                          
+                            </div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
@@ -76,18 +79,16 @@
                                     <table class="hover table table-striped table-bordered dt-responsive nowrap"  cellspacing="0" width="100%"  name="campsite" v-model="selected_campsite">
                                         <thead>
                                             <tr>
-                                                <th class="site">Campsite&nbsp;<a class="float-right" target="_blank" :href="map" v-if="map">View Map</a></th>
+                                                <th class="site">Campsite</th>
                                                 <th class="numBook">Number of sites to book</th>
-                                                <th class="date"> {{booking.departure}} </th>
                                             </tr>
                                         </thead>
                                             <tbody><template v-for="campsite in campsites">
                                                 <tr>
                                                     <td class="site"> {{campsite.name}} - {{campsite.type}}</td>
                                                     <td class="numBook">
-                                                        <input type="checkbox" v-model="selected_campsite.campsites">
-                                                    </td>
-                                                    <td class="price"><i class="fa fa-usd"></i> {{ booking.price }} </td>                                               
+                                                        <input type="checkbox" v-model="campsite.is_selected" @change="updatePrices()">
+                                                    </td>                                              
                                                 </tr></template>
                                             </tbody>
                                     </table>
@@ -116,17 +117,15 @@
                                                  <th class="site">Campsite</th>
                                                  <th class="book">Availability</th>
                                                  <th class="numBook">Number of sites to book</th>
-                                                 <th class="date"> {{booking.departure}} </th>
                                             </tr>
                                         </thead>
-                                        <tbody><template v-for="(c,i) in campsite_classes">
+                                        <tbody><template v-for="c in campsite_classes">
                                             <tr>
-                                                <td class="site"> {{c.name}} <span v-if="c.class"> - {{ classes[c.class] }}</span><span v-if="c.warning" class="siteWarning"> - {{ c.warning }}</span></td>
+                                                <td class="site"> {{c.name}} <span v-if="c.class"> - {{ classes[c.class] }}</span></td>
                                                 <td class="book"> {{ c.campsites.length }} available </td>
                                                 <td class="numBook">
-                                                    <input type="text" name="campsite-type" class="form-control" v-model="c.selected_campsite_class">
-                                                </td> 
-                                                <td class="price"><i class="fa fa-usd"></i> {{ booking.price }} </td>     
+                                                    <input type="number" name="campsite-type" class="form-control" v-model="c.selected_campsite_class">
+                                                </td>
                                             </tr></template>
                                         </tbody>
                                     </table>
@@ -275,7 +274,7 @@
                                         <label for="Total Price">Total Price <span class="text-muted">(GST inclusive.)</span></label>
                                         <div class="input-group">
                                         <span class="input-group-addon">AUD <i class="fa fa-usd"></i></span>
-                                        <input type="text" class="form-control" :placeholder="0|formatMoney(2)" :value="booking.price|formatMoney(2)" readonly="true">
+                                        <input type="text" class="form-control" :placeholder="0|formatMoney(2)" v-bind:value="booking.price|formatMoney(2)" readonly="true">
                                         </div>
                                     </div>
                                 </div>
@@ -296,8 +295,7 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="form-group" v-if="checked">
-                                        <label for="Reason">Reason</label>
-                                        <input type="text" class="form-control" v-model="booking.override_price_reason">
+                                        <reason type="discount" v-model="booking.discount_reason" ref="reason" ></reason>
                                     </div>
                                 </div>
                             </div>
@@ -343,11 +341,12 @@
 import {$,awesomplete,Moment,api_endpoints,validate,formValidate,helpers} from "../../hooks.js";
 import loader from '../utils/loader.vue';
 import modal from '../utils/bootstrap-modal.vue';
+import reason from '../utils/reasons.vue';
 export default {
     name:"addBooking",
     data:function () {
         let vm =this;
-        return{
+        return {
             checked: false,
             isModalOpen:false,
             bookingForm:null,
@@ -376,7 +375,7 @@ export default {
                 vehicle:"",
                 price:"0",
                 override_price:"0",
-                override_price_reason:"",
+                discount_reason:"",
                 parkEntry:{
                     vehicles:0,
                 },
@@ -481,7 +480,8 @@ export default {
     },
     components:{
         loader,
-        modal
+        modal,
+        reason
     },
     computed:{
         isLoading:function () {
@@ -549,9 +549,6 @@ export default {
                 vm.fetchCampsiteClasses();
             }
         },
-        getDateString: function (date, offset) {
-            return moment(date).add(offset, 'days').format('ddd MMM D');
-        },
         validateRego:function (e) {
             formValidate.isNotEmpty(e.target);
         },
@@ -559,13 +556,26 @@ export default {
             let vm = this;
             vm.booking.campsite = vm.selected_campsite;
             vm.booking.price = 0;
+            var campsite_ids = vm.campsites.filter(function (el) {
+                return el.is_selected;
+            }).map(function (el) {
+                return el.id
+            });
             if (vm.selected_campsite) {
                 if (vm.booking.arrival && vm.booking.departure) {
                     var arrival = Moment(vm.booking.arrival, "YYYY-MM-DD");
                     var departure = Moment(vm.booking.departure, "YYYY-MM-DD");
                     var nights = departure.diff(arrival,'days');
                     vm.loading.push('updating prices');
-                    vm.$http.get(api_endpoints.campsite_current_price(vm.booking.campsite,arrival.format("YYYY-MM-DD"),departure.format("YYYY-MM-DD"))).then((response)=>{
+                    vm.$http.post(
+                        api_endpoints.campsites_current_price(),
+                        {
+                            campsites: campsite_ids,
+                            arrival: arrival.format("YYYY-MM-DD"),
+                            departure: departure.format("YYYY-MM-DD")
+                        },
+                        {headers: {'X-CSRFToken': helpers.getCookie('csrftoken')}}
+                    ).then((response)=>{
                         vm.priceHistory = null;
                         vm.priceHistory = response.body;
                         vm.generateBookingPrice();
@@ -575,7 +585,15 @@ export default {
                         vm.loading.splice('updating prices',1);
                     });
                 }else{
-                    vm.$http.get(api_endpoints.campsite_current_price(vm.booking.campsite,Moment().format("YYYY-MM-DD"),Moment().format("YYYY-MM-DD"))).then((response)=>{
+                    vm.$http.post(
+                        api_endpoints.campsites_current_price(), 
+                        {
+                            campsites: campsite_ids,
+                            arrival: arrival.format("YYYY-MM-DD"),
+                            departure: departure.format("YYYY-MM-DD")
+                        },
+                        {headers: {'X-CSRFToken': helpers.getCookie('csrftoken')}}
+                    ).then((response)=>{
                         vm.priceHistory = null;
                         vm.priceHistory = response.body;
                         vm.generateBookingPrice();
@@ -773,12 +791,20 @@ export default {
         generateBookingPrice:function () {
             let vm =this;
             vm.booking.price = 0;
+            var campsite_count = vm.campsites.reduce(function (acc, el) {
+                if (el.is_selected) {
+                    return acc + 1;
+                }
+                return acc;
+            }, 0)
+            console.log('campsite count is')
+            console.log(campsite_count)
             if (vm.park.entry_fee_required){
                 vm.fetchParkPrices(function(){
                     $.each(vm.priceHistory,function (i,price) {
                         for (var guest in vm.booking.guests) {
                             if (vm.booking.guests.hasOwnProperty(guest)) {
-                                vm.booking.price += vm.booking.guests[guest] * price.rate[guest];
+                                vm.booking.price += vm.booking.guests[guest] * price.rate[guest] * campsite_count;
                             }
                         }
                     });
@@ -789,7 +815,7 @@ export default {
                 $.each(vm.priceHistory,function (i,price) {
                     for (var guest in vm.booking.guests) {
                         if (vm.booking.guests.hasOwnProperty(guest)) {
-                            vm.booking.price += vm.booking.guests[guest] * price.rate[guest];
+                            vm.booking.price += vm.booking.guests[guest] * price.rate[guest] * campsite_count;
                         }
                     }
                 });
@@ -916,8 +942,7 @@ export default {
                         total:vm.booking.price
                     },
                     override_price:vm.booking.override_price,
-                    override_price_reason:vm.booking.override_price_reason,
-                    booked_site:vm.booking.booked_site,
+                    discount_reason:vm.booking.discount_reason,
                     customer:{
                         email:vm.booking.email,
                         first_name:vm.booking.firstname,
@@ -1107,9 +1132,5 @@ export default {
     }
     .nav-tabs{
         margin-top: 15px;
-    }
-    .siteWarning {
-        font-weight: bold;
-        font-style: italic;
     }
 </style>

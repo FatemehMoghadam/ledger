@@ -880,12 +880,8 @@ class Booking(models.Model):
     booking_type = models.SmallIntegerField(choices=BOOKING_TYPE_CHOICES, default=0)
     expiry_time = models.DateTimeField(blank=True, null=True)
     cost_total = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
-    override_price_reason = models.TextField(null=True,blank=True)
-<<<<<<< HEAD
+    discount_reason = models.ForeignKey('DiscountReason', null=True,blank=True)
     override_price = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')  
-=======
-    override_price = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
->>>>>>> 4af04810206ab74e9d62cd7c58bf4ea200edfae0
     campground = models.ForeignKey('Campground', null=True)
     is_canceled = models.BooleanField(default=False)
     cancellation_reason = models.TextField(null=True,blank=True)
@@ -1329,6 +1325,10 @@ class ClosureReason(Reason):
 
 class PriceReason(Reason):
     pass
+
+class DiscountReason(Reason):
+    pass
+    
 # VIEWS
 # =====================================
 class ViewPriceHistory(models.Model):

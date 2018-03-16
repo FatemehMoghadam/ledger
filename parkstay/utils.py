@@ -431,6 +431,36 @@ def get_campsite_current_rate(request,campsite_id,start_date,end_date):
                 })
     return res
 
+def get_campsites_current_rate(request, campsites, start_date, end_date):
+    res = []
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date,"%Y-%m-%d").date()
+        end_date = datetime.strptime(end_date,"%Y-%m-%d").date()
+        for single_date in daterange(start_date, end_date):
+            price_history = CampsiteRate.objects.filter(campsite__in = campsites,date_start__lte=single_date).order_by('-date_start')
+            campsite_prices = {}
+            for p in price_history:
+                if p.campsite_id not in campsite_prices:
+                    campsite_prices[p.campsite_id] = p
+                else:
+                    if p.date_start > campsite_prices[p.campsite_id].date_start:
+                        campsite_prices[p.campsite_id] = p
+            if campsite_prices:
+                winning_price = campsite_prices.popitem()[1]
+                for csid, p in campsite_prices.items():
+                    if p.rate.adult < winning_price.rate.adult:
+                        winning_price = p
+            
+                rate = RateSerializer(winning_price.rate, context={'request':request}).data
+                    
+                res.append({
+                    "date" : single_date.strftime("%Y-%m-%d") ,
+                    "rate" : rate,
+                    "campsites": campsites #.values_list('id', flat=True)
+                })
+                
+    return res
+
 def get_park_entry_rate(request,start_date):
     res = []
     if start_date:
@@ -523,7 +553,7 @@ def price_or_lineitems(request,booking,campsite_list,lines=True,old_booking=None
     # Create line items for Discount
     if lines:
         total_price = booking.override_price - booking.cost_total 
-        reason = booking.override_price_reason
+        reason = booking.discount_reason
         invoice_lines.append({'ledger_description':'{}'.format(reason), "Total": total_price, "oracle_code":booking.campground.oracle_code})
 
 def check_date_diff(old_booking,new_booking):
@@ -826,6 +856,8 @@ def internal_create_booking_invoice(booking, checkout_response):
     last_redirect = checkout_response.history[-2]
     reference = last_redirect.url.split('=')[1]
     try:
+        print(last_redirect.url)
+        print(reference)
         Invoice.objects.get(reference=reference)
     except Invoice.DoesNotExist:
         raise Exception("There was a problem attaching an invoice for this booking")
