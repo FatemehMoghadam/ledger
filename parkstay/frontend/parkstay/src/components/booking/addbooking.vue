@@ -76,11 +76,11 @@
                         <div class="col-sm-12">
                             <div v-show="campsites.length > 0" >
                                 <div class="column table-scroll">
-                                    <table class="hover table table-striped table-bordered dt-responsive nowrap"  cellspacing="0" width="100%"  name="campsite" v-model="selected_campsite">
+                                    <table class="hover table table-striped table-bordered dt-responsive nowrap"  cellspacing="0" width="100%"  name="campsite">
                                         <thead>
                                             <tr>
                                                 <th class="site">Campsite</th>
-                                                <th class="numBook">Number of sites to book</th>
+                                                <th class="numBook">Sites to book</th>
                                             </tr>
                                         </thead>
                                             <tbody><template v-for="campsite in campsites">
@@ -111,7 +111,7 @@
                         <div class="col-sm-12">
                             <div v-show="campsite_classes.length > 1">
                                 <div class="column table-scroll">
-                                    <table class="hover table table-striped table-bordered dt-responsive nowrap"  cellspacing="0" width="100%" name="campsite-type" v-model="selected_campsite_class">
+                                    <table class="hover table table-striped table-bordered dt-responsive nowrap"  cellspacing="0" width="100%" name="campsite-type">
                                         <thead>
                                             <tr>
                                                  <th class="site">Campsite</th>
@@ -119,12 +119,12 @@
                                                  <th class="numBook">Number of sites to book</th>
                                             </tr>
                                         </thead>
-                                        <tbody><template v-for="c in campsite_classes">
+                                        <tbody><template v-for="campsite in campsite_classes">
                                             <tr>
-                                                <td class="site"> {{c.name}} <span v-if="c.class"> - {{ classes[c.class] }}</span></td>
-                                                <td class="book"> {{ c.campsites.length }} available </td>
+                                                <td class="site"> {{campsite.name}} <span v-if="campsite.class"> - {{ classes[campsite.class] }}</span></td>
+                                                <td class="book"> {{ campsite.campsites.length }} available </td>
                                                 <td class="numBook">
-                                                    <input type="number" name="campsite-type" class="form-control" v-model="c.selected_campsite_class">
+                                                    <input type="number" name="campsite-type" v-model="campsite.multisites" @change="updatePrices()">
                                                 </td>
                                             </tr></template>
                                         </tbody>
@@ -366,6 +366,7 @@ export default {
                 },
                 campground:"",
                 campsite:"",
+                multisites:"",
                 email:"",
                 firstname:"",
                 surname:"",
@@ -387,7 +388,7 @@ export default {
                     regos:[]
                 }
             },
-            campsites:[],     
+            campsites:[],
             loading:[],
             campground:{},
             guestsText:"",
@@ -492,7 +493,14 @@ export default {
             var entries =  ( vm.booking.parkEntry.vehicles <= 10 ) ? vm.booking.parkEntry.vehicles :  10;
             vm.booking.parkEntry.vehicles = entries;
             return entries;
-        }
+        },
+        selectedCampsites: function () {
+            return this.campsites.filter(function (el) {
+                return el.is_selected;
+            }).map(function (el) {
+                return el.id
+            });
+        }  
     },
     filters:{
         formatMoney:function(n,c, d, t){
@@ -561,6 +569,15 @@ export default {
             }).map(function (el) {
                 return el.id
             });
+            
+            if (vm.booking_type == vm.booking_types.CLASS) {
+                var campsite_ids = vm.campsite_classes.filter(function (el) {
+                    return el.multisites;
+                    }).map(function (el) {
+                        return el.id
+                    });
+            }
+
             if (vm.selected_campsite) {
                 if (vm.booking.arrival && vm.booking.departure) {
                     var arrival = Moment(vm.booking.arrival, "YYYY-MM-DD");
@@ -570,25 +587,7 @@ export default {
                     vm.$http.post(
                         api_endpoints.campsites_current_price(),
                         {
-                            campsites: campsite_ids,
-                            arrival: arrival.format("YYYY-MM-DD"),
-                            departure: departure.format("YYYY-MM-DD")
-                        },
-                        {headers: {'X-CSRFToken': helpers.getCookie('csrftoken')}}
-                    ).then((response)=>{
-                        vm.priceHistory = null;
-                        vm.priceHistory = response.body;
-                        vm.generateBookingPrice();
-                        vm.loading.splice('updating prices',1);
-                    },(error)=>{
-                        console.log(error);
-                        vm.loading.splice('updating prices',1);
-                    });
-                }else{
-                    vm.$http.post(
-                        api_endpoints.campsites_current_price(), 
-                        {
-                            campsites: campsite_ids,
+                            campsites: campsite_ids, 
                             arrival: arrival.format("YYYY-MM-DD"),
                             departure: departure.format("YYYY-MM-DD")
                         },
@@ -934,7 +933,7 @@ export default {
                     arrival:vm.booking.arrival,
                     departure:vm.booking.departure,
                     guests:vm.booking.guests,
-                    campsite:vm.booking.campsite,
+                    campsites:vm.booking.campsite,
                     parkEntry:vm.booking.entryFees,
                     costs:{
                         campground:vm.priceHistory,
